@@ -8,19 +8,27 @@ export default function Register() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
     setError('');
+
+    // التحقق من تطابق كلمة المرور وتأكيدها محلياً أولاً
+    if (password !== confirmPassword) {
+      setError('كلمتا المرور غير متطابقتين');
+      return;
+    }
+
     try {
-      const response = await API.post('/auth/register', { name, email, password });
+      const response = await API.post('/auth/register', { name, email, password, confirmPassword });
       // حفظ التوكن وبيانات المستخدم في localStorage
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
       
-      // التوجيه التلقائي لصفحة المستخدم كما طلب في المشروع
+      // التوجيه التلقائي لصفحة المستخدم
       navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'حدث خطأ أثناء إنشاء الحساب');
@@ -57,6 +65,14 @@ export default function Register() {
           placeholder="كلمة المرور (6 أحرف على الأقل)"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
+          className="form-input"
+        />
+        <input
+          type="password"
+          placeholder="تأكيد كلمة المرور"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
           required
           className="form-input"
         />

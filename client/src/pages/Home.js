@@ -6,7 +6,7 @@ import '../App.css';
 
 export default function Home() {
   const [images, setImages] = useState([]);
-  const [selectedImage, setSelectedImage] = useState(null); // لتكبير الصورة
+  const [selectedImage, setSelectedImage] = (useState(null)); // لتكبير الصورة
   const [loading, setLoading] = useState(true);
   const token = localStorage.getItem('token');
   const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
@@ -33,12 +33,8 @@ export default function Home() {
     }
 
     try {
-     
       playLikeSound();
-
       const res = await API.post(`/images/${id}/like`);
-      
-     
       setImages(images.map(img => img._id === id ? { ...img, likes: res.data.likes } : img));
     } catch (err) {
       console.error('خطأ في تسجيل الإعجاب', err);
@@ -56,7 +52,7 @@ export default function Home() {
       ) : (
         <div className="images-grid">
           {images.map((img) => {
-            const isLiked = img.likes.includes(currentUser.id);
+            const isLiked = token ? img.likes.includes(currentUser.id) : false;
             return (
               <div key={img._id} className="image-card">
                 {/* عرض الصورة كمصغرة وعند الضغط عليها تكبر */}
@@ -71,25 +67,32 @@ export default function Home() {
                   <p style={{ fontSize: '0.9rem', color: '#666', margin: '0 0 0.5rem 0' }}>{img.description}</p>
                   <p style={{ fontSize: '0.8rem', color: '#888', marginBottom: '1rem' }}>رفع بواسطة: {img.user?.name || 'مستخدم'}</p>
 
-                  {/* زر الإعجاب */}
-                  <div className="card-actions" style={{ borderTop: '1px solid #eee', paddingTop: '0.5rem' }}>
-                    <button 
-                      onClick={() => handleLike(img._id)} 
-                      className="btn-login"
-                      style={{ 
-                        background: 'none', 
-                        border: 'none', 
-                        color: isLiked ? '#e91e63' : '#666',
-                        padding: '0.4rem 0.8rem',
-                        cursor: 'pointer',
-                        fontSize: '1rem',
-                        fontWeight: 'bold'
-                      }}
-                    >
-                      <Heart fill={isLiked ? '#e91e63' : 'none'} size={20} />
-                      <span>{img.likes.length}</span>
-                    </button>
-                  </div>
+                  {/* زر الإعجاب يظهر فقط للمستخدم المسجل دخوله */}
+                  {token ? (
+                    <div className="card-actions" style={{ borderTop: '1px solid #eee', paddingTop: '0.5rem' }}>
+                      <button 
+                        onClick={() => handleLike(img._id)} 
+                        className="btn-login"
+                        style={{ 
+                          background: 'none', 
+                          border: 'none', 
+                          color: isLiked ? '#e91e63' : '#666',
+                          padding: '0.4rem 0.8rem',
+                          cursor: 'pointer',
+                          fontSize: '1rem',
+                          fontWeight: 'bold'
+                        }}
+                      >
+                        <Heart fill={isLiked ? '#e91e63' : 'none'} size={20} />
+                        <span>{img.likes.length}</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <div style={{ borderTop: '1px solid #eee', paddingTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#888', fontSize: '0.9rem' }}>
+                      <Heart size={18} />
+                      <span>{img.likes.length} إعجاب</span>
+                    </div>
+                  )}
                 </div>
               </div>
             );
@@ -97,7 +100,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* نافذة منبثقة لتكبير الصورة (Modal) */}
+      }
       {selectedImage && (
         <div 
           style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.8)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }} 

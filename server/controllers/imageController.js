@@ -43,7 +43,7 @@ exports.getAllImages = async (req, res) => {
   try {
     // جلب أحدث الصور وترتيبها تنازلياً مع إحضار اسم صاحب الصورة فقط
     const images = await Image.find()
-      .populate('user', 'name email')
+      .populate('user', 'name')
       .sort({ createdAt: -1 });
 
     res.json({
