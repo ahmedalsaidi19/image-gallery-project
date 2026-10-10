@@ -1,12 +1,12 @@
 const jwt = require('jsonwebtoken');
-const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_jwt_key_123';
+const JWT_SECRET = process.env.JWT_SECRET;
 
 module.exports = (req, res, next) => {
 
   const authHeader = req.header('Authorization');
   
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ success: false, message: 'غيرحاصل على صلاحية الوصول، يرجى تسجيل الدخول' });
+    return res.status(401).json({ success: false, message: 'غير حاصل على صلاحية الوصول، يرجى تسجيل الدخول' });
   }
 
   try {
